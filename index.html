@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Distribuidora – Inventario y Ventas (Supabase)</title>
+<style>
+:root{--bg:#f3f5f9;--cd:#fff;--tx:#18212f;--mu:#667085;--bd:#e3e7ee;--pr:#0f5fbf;--p2:#e8f1fc;--ok:#157a47;--wa:#b4570a;--er:#c3262e;--sh:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.04);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f131a;--cd:#18202b;--tx:#e8ecf2;--mu:#9aa5b5;--bd:#2a3340;--pr:#5aa6f2;--p2:#1b2a3d;--ok:#4cc486;--wa:#f2a35e;--er:#f2797f;--sh:none;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14.5px/1.45 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(135deg,#0b3f82,#0f5fbf);color:#fff;padding:14px 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header h1{font-size:18px;margin:0}header small{opacity:.85}
+header label{color:#fff;opacity:.95}header input{width:92px}
+nav{display:flex;gap:2px;overflow-x:auto;background:var(--cd);border-bottom:1px solid var(--bd);padding:6px 10px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;box-shadow:var(--sh)}
+nav button{background:none;border:0;color:var(--mu);padding:9px 14px;border-radius:8px;cursor:pointer;font:inherit;white-space:nowrap}
+nav button.on{background:var(--p2);color:var(--pr);font-weight:600}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.sec{display:none}.sec.on{display:block}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));margin-bottom:16px}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:16px;box-shadow:var(--sh);margin-bottom:14px}
+.kpi span{color:var(--mu);font-size:12.5px}.kpi b{display:block;font-size:21px;margin-top:2px}
+h2{font-size:16px;margin:0 0 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:end}
+label{display:flex;flex-direction:column;font-size:12px;color:var(--mu);gap:3px}
+input,select{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);min-width:0}
+input:focus,select:focus{outline:2px solid var(--pr);outline-offset:-1px}
+.bad{border-color:var(--er)!important;background:color-mix(in srgb,var(--er) 10%,var(--bg))}
+button.b{font:inherit;padding:8px 14px;border:0;border-radius:9px;background:var(--pr);color:#fff;cursor:pointer;font-weight:500}
+button.g{background:var(--p2);color:var(--pr)}button.d{background:var(--er)}button.s{padding:4px 9px;font-size:12.5px}
+button:disabled{opacity:.4;cursor:not-allowed}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+th{color:var(--mu);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+td.n,th.n{text-align:right}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--p2);color:var(--pr)}
+.tag.o{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}.tag.w{background:color-mix(in srgb,var(--wa) 15%,transparent);color:var(--wa)}.tag.e{background:color-mix(in srgb,var(--er) 14%,transparent);color:var(--er)}
+.two{display:grid;gap:14px;grid-template-columns:1.6fr 1fr}@media(max-width:850px){.two{grid-template-columns:1fr}}
+.tot div{display:flex;justify-content:space-between;padding:3px 0}.tot .t{font-size:20px;font-weight:700;border-top:1px solid var(--bd);margin-top:4px;padding-top:8px}
+.note{color:var(--mu);font-size:12.5px}.empty{color:var(--mu);text-align:center;padding:18px}
+#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:11px 18px;border-radius:10px;display:none;z-index:99;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw}
+#mo{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+#mo .box{background:var(--cd);border-radius:14px;padding:20px;max-width:420px;width:100%;max-height:90vh;overflow:auto}
+.tk{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}.tk hr{border:0;border-top:1px dashed var(--mu)}.tk div{display:flex;justify-content:space-between;gap:10px}
+@media print{body>*:not(#mo){display:none!important}#mo{position:static;background:none;display:block!important;padding:0}#mo .box{box-shadow:none;max-width:none;color:#000;background:#fff}.np{display:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>🚚 Distribuidora – Inventario y Ventas</h1><small>Córdobas (C$) · IVA 15 % · referencia en US$</small></div>
+  <label>Tipo de cambio C$/US$<input id="rate" type="number" step="0.01"></label>
+  <button class="b g s" onclick="API.signOut().then(()=>location.reload())">Cerrar sesión</button>
+</header>
+<nav id="nav"><button data-t="panel">Panel</button><button data-t="inv">Inventario</button><button data-t="venta">Ventas</button><button data-t="compra">Compras y ajustes</button><button data-t="kardex">Kardex</button><button data-t="hist">Facturas</button></nav>
+<main>
+<section class="sec" id="panel">
+  <div class="grid" id="kpis"></div>
+  <div class="two"><div class="card"><h2>⚠️ Alertas accionables</h2><div class="tw"><table id="tAl"></table></div></div>
+  <div class="card"><h2>🏆 Más vendidos</h2><div class="tw"><table id="tTop"></table></div></div></div>
+  <div class="card"><h2>📊 Resumen por categoría</h2><div class="tw"><table id="tCat"></table></div></div>
+  <div class="card"><h2>Datos y respaldo</h2><div class="row"><button class="b g" onclick="exp('p')">CSV inventario</button><button class="b g" onclick="exp('v')">CSV ventas</button><button class="b g" onclick="exp('k')">CSV kardex</button><button class="b g" onclick="refresh()">Recargar datos</button></div><p class="note">Los datos viven en Supabase (PostgreSQL). Exporta CSV para respaldos adicionales.</p></div>
+</section>
+
+<section class="sec" id="inv">
+  <div class="card"><h2 id="fT">Nuevo producto</h2>
+    <div class="row">
+      <label>Código<input id="pCode"></label><label>Nombre / presentación<input id="pName" style="width:230px"></label>
+      <label>Categoría<input id="pCat" list="dc"></label><label>Subcategoría / línea<input id="pSub"></label>
+      <label>Unidad<select id="pUm"></select></label>
+    </div><div class="row">
+      <label>Costo C$<input id="pCost" type="number" step="0.01" min="0" style="width:95px"></label>
+      <label>Precio detalle C$<input id="pPrice" type="number" step="0.01" min="0" style="width:105px"></label>
+      <label>Precio mayorista C$<input id="pPm" type="number" step="0.01" min="0" style="width:115px"></label>
+      <label>Stock<input id="pStock" type="number" min="0" style="width:80px"></label><label>Mínimo<input id="pMin" type="number" min="0" style="width:80px"></label>
+      <label>IVA<select id="pEx"><option value="0">Gravado 15 %</option><option value="1">Exento</option></select></label>
+      <button class="b" onclick="saveP()">Guardar</button><button class="b g" onclick="clearP()">Limpiar</button>
+    </div><datalist id="dc"></datalist>
+    <p class="note">Precios sin IVA. Margen % = (precio detalle − costo) ÷ precio detalle.</p>
+  </div>
+  <div class="card">
+    <div class="row">
+      <label>Buscar<input id="q" placeholder="Código, nombre, categoría"></label>
+      <label>Categoría<select id="fCat"></select></label>
+      <label>Stock<select id="fSt"><option value="">Todos</option><option>OK</option><option>Bajo</option><option>Agotado</option></select></label>
+      <label>Fiscal<select id="fIv"><option value="">Todos</option><option value="0">Gravado 15 %</option><option value="1">Exento</option></select></label>
+      <label>ABC<select id="fAbc"><option value="">Todas</option><option>A</option><option>B</option><option>C</option></select></label>
+      <label>Ordenar por<select id="fSo"><option value="code">Código</option><option value="name">Nombre</option><option value="cat">Categoría</option><option value="abc">Clasificación ABC</option><option value="mg">Margen</option><option value="price">Precio</option><option value="stock">Stock</option></select></label>
+      <label>Vista<select id="fVw"><option value="l">Lista</option><option value="c">Agrupada por categoría</option></select></label>
+    </div>
+    <p class="note"><b>Clasificación ABC (Pareto):</b> se ordena el valor vendido (unidades × precio; si aún no hay ventas, el valor de inventario al costo). <b>A</b> = productos que acumulan el primer 80 %, <b>B</b> el siguiente 15 %, <b>C</b> el 5 % restante.</p>
+    <div class="tw"><table id="tInv"></table></div>
+  </div>
+</section>
+
+<section class="sec" id="venta"><div class="two">
+  <div class="card"><h2>Catálogo</h2><div class="row"><label>Buscar (código, nombre, categoría)<input id="qv" style="width:260px"></label></div><div class="tw"><table id="tPos"></table></div></div>
+  <div class="card"><h2>🧾 Factura actual</h2>
+    <div class="row"><label>Cliente<input id="cli" placeholder="Consumidor final"></label>
+    <label>Tipo de precio<select id="tipo"><option>Detalle</option><option>Mayorista</option></select></label>
+    <label>Pago<select id="pay"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>Crédito</option></select></label>
+    <label>Descuento %<input id="dsc" type="number" min="0" max="50" value="0" style="width:80px"></label></div>
+    <div class="tw"><table id="tCart"></table></div><div class="tot" id="tot"></div>
+    <div class="row" style="margin-top:10px"><button class="b" onclick="bill()">Facturar</button><button class="b g" onclick="cart=[];rCart()">Vaciar</button></div>
+  </div></div>
+</section>
+
+<section class="sec" id="compra">
+  <div class="card"><h2>Registrar compra a proveedor</h2><div class="row">
+    <label>Producto<select id="cProd"></select></label><label>Proveedor<input id="cProv"></label><label>N.º documento / factura<input id="cDoc"></label>
+    <label>Cantidad<input id="cQty" type="number" min="1" style="width:85px"></label><label>Costo unit. C$<input id="cCost" type="number" step="0.01" min="0" style="width:105px"></label>
+    <label>Método de costo<select id="cMet"><option value="p">Promedio ponderado</option><option value="u">Último costo</option></select></label>
+    <button class="b" onclick="buy()">Registrar compra</button></div></div>
+  <div class="card"><h2>Ajustes, mermas y devoluciones</h2><div class="row">
+    <label>Producto<select id="aProd"></select></label>
+    <label>Tipo<select id="aTipo"><option>Ajuste físico</option><option>Merma</option><option>Daño</option><option>Devolución de cliente</option></select></label>
+    <label>Cantidad (en ajuste físico: stock real)<input id="aQty" type="number" min="0" style="width:150px"></label>
+    <label>Motivo (obligatorio)<input id="aWhy" style="width:220px"></label><button class="b g" onclick="adj()">Aplicar</button></div></div>
+  <div class="card"><h2>Historial de compras</h2><div class="tw"><table id="tBuy"></table></div></div>
+</section>
+
+<section class="sec" id="kardex"><div class="card"><div class="row">
+  <label>Producto<select id="kProd"></select></label><label>Tipo de movimiento<select id="kTipo"></select></label></div>
+  <div class="tw"><table id="tK"></table></div></div>
+</section>
+
+<section class="sec" id="hist"><div class="card tw"><table id="tH"></table></div></section>
+</main>
+<div id="lg" style="position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:80;padding:16px"><div class="card" style="max-width:360px;width:100%"><h2>🔐 Iniciar sesión</h2><div class="row" style="flex-direction:column;align-items:stretch"><label>Correo<input id="lgE" type="email" autocomplete="username"></label><label>Contraseña<input id="lgP" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"></label><button class="b" onclick="login()">Entrar</button></div></div></div>
+<div id="msg"></div>
+<div id="mo" onclick="if(event.target===this)this.style.display='none'"><div class="box"><div id="tk" class="tk"></div><div class="row np" style="margin-top:14px"><button class="b" onclick="print()">🖨️ Imprimir</button><button class="b g" onclick="mo.style.display='none'">Cerrar</button></div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+const KEY='dist_ni_v2',IVA=.15,UM=['Unidad','Libra','Litro','Caja','Paquete','Botella','Lata','Saco','Quintal'];
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const C$=n=>'C$ '+Number(n||0).toLocaleString('es-NI',{minimumFractionDigits:2,maximumFractionDigits:2});
+const now=()=>new Date().toLocaleString('es-NI',{dateStyle:'short',timeStyle:'short'});
+let S={rate:36.62,prods:[],movs:[],sales:[],buys:[]};
+const save=()=>{};let busy=false;
+async function run(fn,ok){if(busy)return;busy=true;try{await fn();await refresh();if(ok)toast(ok)}catch(e){toast(e.message||'Error','e')}finally{busy=false}}
+async function refresh(){try{S=await API.load();all()}catch(e){toast('No se pudo cargar: '+e.message,'e')}}
+function toast(t,k){const m=$('msg');m.style.background=k==='e'?'var(--er)':'var(--ok)';m.textContent=(k==='e'?'⚠️ ':'✅ ')+t;m.style.display='block';clearTimeout(m._t);m._t=setTimeout(()=>m.style.display='none',2800)}
+const prod=id=>S.prods.find(p=>p.id==id),mg=p=>p.price?(p.price-p.cost)/p.price*100:0;
+const st=p=>p.stock<=0?'Agotado':p.stock<=p.min?'Bajo':'OK',stc=s=>s==='OK'?'o':s==='Bajo'?'w':'e';
+function mov(p,type,qty,ref){S.movs.push({d:now(),pid:p.id,type,qty,bal:p.stock,ref})}
+function req(ids){let ok=true;ids.forEach(i=>{const e=$(i),bad=e.value.trim()==='';e.classList.toggle('bad',bad);if(bad)ok=false});if(!ok)toast('Completa los campos marcados','e');return ok}
+function abc(){const v={};S.prods.forEach(p=>v[p.id]=0);
+ if(S.sales.length)S.sales.forEach(s=>s.items.forEach(i=>{if(i.pid in v)v[i.pid]+=i.qty*i.price}));else S.prods.forEach(p=>v[p.id]=p.stock*p.cost);
+ const a=Object.entries(v).sort((x,y)=>y[1]-x[1]),t=a.reduce((s,x)=>s+x[1],0)||1;let c=0;const m={};
+ a.forEach(([id,x])=>{const b=c/t;m[id]=b<.8?'A':b<.95?'B':'C';c+=x});return m}
+const tabs=['panel','inv','venta','compra','kardex','hist'];
+function go(){const t=tabs.includes(location.hash.slice(1))?location.hash.slice(1):'panel';
+ document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on',s.id===t));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));all()}
+$('nav').onclick=e=>{if(e.target.dataset.t)location.hash=e.target.dataset.t};addEventListener('hashchange',go);
+const tbl=(h,rows,cs)=>'<tr>'+h.map(x=>`<th class="${x[0]==='>'?'n':''}">${x.replace(/^>/,'')}</th>`).join('')+'</tr>'+(rows.join('')||`<tr><td colspan="${cs||h.length}" class="empty">Sin datos</td></tr>`);
+
+function rPanel(){
+ const P=S.prods,vc=P.reduce((a,p)=>a+p.stock*p.cost,0),vv=P.reduce((a,p)=>a+p.stock*p.price,0),vt=S.sales.reduce((a,s)=>a+s.total,0),iv=S.sales.reduce((a,s)=>a+s.iva,0),ut=S.sales.reduce((a,s)=>a+s.utilidad,0);
+ const bj=P.filter(p=>st(p)==='Bajo').length,ag=P.filter(p=>st(p)==='Agotado').length,mp=P.length?P.reduce((a,p)=>a+mg(p),0)/P.length:0;
+ $('kpis').innerHTML=[['Inventario al costo',C$(vc)],['Valor potencial de venta',C$(vv)],['Ventas totales',C$(vt)],['IVA 15 % facturado',C$(iv)],['Utilidad bruta',C$(ut)],['Margen promedio',mp.toFixed(1)+' %'],['Stock bajo / agotado',bj+' / '+ag],['Inventario en US$','$ '+(vc/S.rate).toLocaleString('en-US',{maximumFractionDigits:0})]].map(k=>`<div class="card kpi" style="margin:0"><span>${k[0]}</span><b>${k[1]}</b></div>`).join('');
+ $('tAl').innerHTML=tbl(['Producto','>Stock','>Mín.','Estado',''],P.filter(p=>p.stock<=p.min).map(p=>`<tr><td>${esc(p.name)}</td><td class="n">${p.stock}</td><td class="n">${p.min}</td><td><span class="tag ${stc(st(p))}">${st(p)}</span></td><td><button class="b s" onclick="reponer(${p.id})">Reponer</button></td></tr>`),5);
+ const c={};S.sales.forEach(s=>s.items.forEach(i=>c[i.pid]=(c[i.pid]||0)+i.qty));
+ $('tTop').innerHTML=tbl(['Producto','>Uds.'],Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([id,q])=>`<tr><td>${prod(id)?esc(prod(id).name):'—'}</td><td class="n">${q}</td></tr>`));
+ const g={};P.forEach(p=>{const o=g[p.cat]=g[p.cat]||{n:0,u:0,c:0,v:0};o.n++;o.u+=p.stock;o.c+=p.stock*p.cost;o.v+=p.stock*p.price});
+ $('tCat').innerHTML=tbl(['Categoría','>Productos','>Unidades','>Valor al costo','>Valor de venta','>% inventario'],Object.entries(g).sort((a,b)=>b[1].c-a[1].c).map(([k,o])=>`<tr><td>${esc(k)}</td><td class="n">${o.n}</td><td class="n">${o.u}</td><td class="n">${C$(o.c)}</td><td class="n">${C$(o.v)}</td><td class="n">${vc?(o.c/vc*100).toFixed(1):0} %</td></tr>`));
+}
+function reponer(id){location.hash='compra';setTimeout(()=>{$('cProd').value=id;$('cQty').focus()},50)}
+
+let eid=null;
+function clearP(){eid=null;['pCode','pName','pCat','pSub','pCost','pPrice','pPm','pStock','pMin'].forEach(i=>{$(i).value='';$(i).classList.remove('bad')});$('pEx').value='0';$('fT').textContent='Nuevo producto'}
+function fillP(p,dup){$('pCode').value=dup?p.code+'-COPIA':p.code;$('pName').value=p.name;$('pCat').value=p.cat;$('pSub').value=p.sub;$('pUm').value=p.um;$('pCost').value=p.cost;$('pPrice').value=p.price;$('pPm').value=p.pm;$('pStock').value=dup?0:p.stock;$('pMin').value=p.min;$('pEx').value=p.ex;scrollTo(0,0)}
+function editP(id){eid=id;const p=prod(id);fillP(p);$('fT').textContent='Editando: '+p.name}
+function dupP(id){eid=null;fillP(prod(id),1);$('fT').textContent='Duplicando producto (cambia el código)'}
+function saveP(){
+ if(!req(['pCode','pName','pCat','pCost','pPrice']))return;
+ const d={code:$('pCode').value.trim(),name:$('pName').value.trim(),cat:$('pCat').value.trim(),sub:$('pSub').value.trim()||'General',um:$('pUm').value,cost:+$('pCost').value,price:+$('pPrice').value,pm:+$('pPm').value||+$('pPrice').value,stock:Math.max(0,+$('pStock').value||0),min:+$('pMin').value||0,ex:+$('pEx').value};
+ if(d.price<d.cost&&!confirm('El precio es menor que el costo. ¿Guardar de todos modos?'))return;
+ if(S.prods.some(p=>p.code===d.code&&p.id!==eid)){$('pCode').classList.add('bad');return toast('Ese código ya existe','e')}
+ const old=eid?prod(eid).stock:0,id=eid;
+ run(async()=>{await API.saveProduct(id,d,old);clearP()},'Producto guardado')}
+function delP(id){if(!confirm('¿Eliminar este producto? Su kardex se conservará.'))return;run(()=>API.deleteProduct(id),'Producto eliminado')}
+function rInv(){
+ const q=$('q').value.toLowerCase(),A=abc(),f={c:$('fCat').value,s:$('fSt').value,i:$('fIv').value,a:$('fAbc').value,o:$('fSo').value};
+ let l=S.prods.filter(p=>(p.code+p.name+p.cat+p.sub).toLowerCase().includes(q)&&(!f.c||p.cat===f.c)&&(!f.s||st(p)===f.s)&&(f.i===''||p.ex==f.i)&&(!f.a||A[p.id]===f.a));
+ const k={code:p=>p.code,name:p=>p.name,cat:p=>p.cat+p.sub,abc:p=>A[p.id],mg:p=>-mg(p),price:p=>-p.price,stock:p=>p.stock};
+ l.sort((a,b)=>k[f.o](a)>k[f.o](b)?1:-1);
+ const row=p=>`<tr><td>${esc(p.code)}</td><td>${esc(p.name)}</td><td>${esc(p.cat)} › ${esc(p.sub)}</td><td>${p.um}</td><td class="n">${C$(p.cost)}</td><td class="n">${C$(p.price)}</td><td class="n">${C$(p.pm)}</td><td class="n">${mg(p).toFixed(1)} % · ${C$(p.price-p.cost)}</td><td class="n"><span class="tag ${stc(st(p))}">${p.stock}</span></td><td><span class="tag">${A[p.id]}</span></td><td>${p.ex?'Exento':'15 %'}</td><td><button class="b g s" onclick="editP(${p.id})">Editar</button> <button class="b g s" onclick="dupP(${p.id})">Duplicar</button> <button class="b d s" onclick="delP(${p.id})">✕</button></td></tr>`;
+ const H=['Código','Producto','Categoría › línea','Unidad','>Costo','>Detalle','>Mayorista','>Margen','>Stock','ABC','IVA',''];
+ if($('fVw').value==='c'){const g={};l.forEach(p=>(g[p.cat]=g[p.cat]||[]).push(p));
+  $('tInv').innerHTML=Object.keys(g).sort().map(c=>`<tr><td colspan="12" style="background:var(--p2);font-weight:600">${esc(c)} — ${g[c].length} productos · ${g[c].reduce((a,p)=>a+p.stock,0)} uds. · ${C$(g[c].reduce((a,p)=>a+p.stock*p.cost,0))}</td></tr>`+tbl(H,g[c].map(row)).replace(/^<tr>.*?<\/tr>/,'')).join('')||tbl(H,[])}
+ else $('tInv').innerHTML=tbl(H,l.map(row));
+}
+let cart=[];
+const pr=p=>$('tipo').value==='Mayorista'?p.pm:p.price;
+function rPos(){const q=$('qv').value.toLowerCase();
+ $('tPos').innerHTML=tbl(['Código','Producto','Unidad','>Precio c/IVA','>Stock',''],S.prods.filter(p=>(p.code+p.name+p.cat+p.sub).toLowerCase().includes(q)).map(p=>`<tr><td>${esc(p.code)}</td><td>${esc(p.name)}</td><td>${p.um}</td><td class="n">${C$(pr(p)*(p.ex?1:1+IVA))}</td><td class="n">${p.stock}</td><td><button class="b s" ${p.stock<1?'disabled':''} onclick="add(${p.id})">+</button></td></tr>`))}
+function add(id){const p=prod(id),c=cart.find(x=>x.pid===id),n=(c?c.qty:0)+1;if(n>p.stock)return toast('Stock insuficiente','e');c?c.qty=n:cart.push({pid:id,qty:1});rCart()}
+function calc(){const d=Math.min(50,Math.max(0,+$('dsc').value||0))/100;let sub=0,iva=0;cart.forEach(c=>{const p=prod(c.pid),b=pr(p)*c.qty;sub+=b;if(!p.ex)iva+=b*(1-d)*IVA});const ds=sub*d;return{sub,ds,iva,total:sub-ds+iva}}
+function rCart(){$('tCart').innerHTML=tbl(['Producto','>Cant.','>Importe',''],cart.map((c,i)=>{const p=prod(c.pid);return`<tr><td>${esc(p.name)}</td><td class="n"><input type="number" min="1" max="${p.stock}" value="${c.qty}" style="width:62px" onchange="qty(${i},this.value)"></td><td class="n">${C$(pr(p)*c.qty)}</td><td><button class="b d s" onclick="cart.splice(${i},1);rCart()">✕</button></td></tr>`}),4);
+ const t=calc();$('tot').innerHTML=`<div><span>Subtotal</span><span>${C$(t.sub)}</span></div><div><span>Descuento</span><span>− ${C$(t.ds)}</span></div><div><span>IVA 15 %</span><span>${C$(t.iva)}</span></div><div class="t"><span>Total</span><span>${C$(t.total)}</span></div><div class="note"><span>≈ US$ ${(t.total/S.rate).toFixed(2)}</span></div>`}
+function qty(i,v){const p=prod(cart[i].pid);cart[i].qty=Math.max(1,Math.min(+v||1,p.stock));rCart()}
+function bill(){if(!cart.length)return toast('Agrega productos a la factura','e');let n;
+ run(async()=>{n=(await API.sale($('cli').value.trim()||'Consumidor final',$('tipo').value,$('pay').value,+$('dsc').value||0,cart)).numero;cart=[];$('cli').value='';$('dsc').value=0},'Factura emitida').then(()=>n&&ticket(n))}
+function ticket(n){const s=S.sales.find(x=>x.num===n);$('tk').innerHTML=`<div style="justify-content:center"><b>DISTRIBUIDORA – NICARAGUA</b></div><div style="justify-content:center">Factura ${s.num}</div><div>${s.d}</div><div><span>Cliente: ${esc(s.cli)}</span></div><div><span>Precio: ${s.tipo}</span><span>Pago: ${s.pay}</span></div><hr>`+s.items.map(i=>`<div><span>${i.qty} ${i.um} ${esc(i.name)}${i.ex?' (E)':''}</span><span>${C$(i.qty*i.price)}</span></div>`).join('')+`<hr><div><span>Subtotal</span><span>${C$(s.sub)}</span></div><div><span>Descuento (${s.dsc}%)</span><span>-${C$(s.ds)}</span></div><div><span>IVA 15 %</span><span>${C$(s.iva)}</span></div><div><b>TOTAL</b><b>${C$(s.total)}</b></div><div><span>Ref. US$</span><span>${(s.total/S.rate).toFixed(2)}</span></div><hr><div style="justify-content:center">(E) = exento de IVA · Gracias por su compra</div>`;$('mo').style.display='flex'}
+function buy(){if(!req(['cProv','cDoc','cQty','cCost']))return;
+ const q=+$('cQty').value,c=+$('cCost').value;if(!(q>0))return toast('Cantidad inválida','e');
+ run(async()=>{await API.buy(+$('cProd').value,$('cProv').value.trim(),$('cDoc').value.trim(),q,c,$('cMet').value);['cProv','cDoc','cQty','cCost'].forEach(i=>$(i).value='')},'Compra registrada')}
+function adj(){if(!req(['aQty','aWhy']))return;const p=prod($('aProd').value),t=$('aTipo').value,n=+$('aQty').value;
+ if((t==='Merma'||t==='Daño')&&n>p.stock)return toast('La cantidad supera el stock','e');
+ run(async()=>{await API.adjust(p.id,t,n,$('aWhy').value.trim());$('aQty').value='';$('aWhy').value=''},t+' aplicado')}
+function rBuy(){$('tBuy').innerHTML=tbl(['Fecha','Producto','Proveedor','Documento','>Cant.','>Costo unit.','>Total','Método'],[...S.buys].reverse().map(b=>`<tr><td>${b.d}</td><td>${esc(b.name)}</td><td>${esc(b.prov)}</td><td>${esc(b.doc)}</td><td class="n">${b.qty}</td><td class="n">${C$(b.cost)}</td><td class="n">${C$(b.total)}</td><td>${b.met}</td></tr>`))}
+function rK(){const ty=[...new Set(S.movs.map(m=>m.type))],cur=$('kTipo').value;$('kTipo').innerHTML='<option value="">Todos</option>'+ty.map(t=>`<option>${t}</option>`).join('');$('kTipo').value=cur;
+ $('tK').innerHTML=tbl(['Fecha','Movimiento','Referencia','>Entrada','>Salida','>Saldo'],S.movs.filter(m=>m.pid==$('kProd').value&&(!$('kTipo').value||m.type===$('kTipo').value)).map(m=>`<tr><td>${m.d}</td><td>${m.type}</td><td>${esc(m.ref)}</td><td class="n">${m.qty>0?m.qty:''}</td><td class="n">${m.qty<0?-m.qty:''}</td><td class="n">${m.bal}</td></tr>`))}
+function rH(){$('tH').innerHTML=tbl(['N.º','Fecha','Cliente','Precio','Pago','>Subtotal','>IVA','>Total',''],[...S.sales].reverse().map(s=>`<tr><td>${s.num}</td><td>${s.d}</td><td>${esc(s.cli)}</td><td>${s.tipo}</td><td>${s.pay}</td><td class="n">${C$(s.sub-s.ds)}</td><td class="n">${C$(s.iva)}</td><td class="n"><b>${C$(s.total)}</b></td><td><button class="b g s" onclick="ticket('${s.num}')">Ver / imprimir</button></td></tr>`))}
+function exp(t){const R={p:[['Codigo','Producto','Categoria','Linea','Unidad','Costo','Detalle','Mayorista','Stock','Minimo','IVA']].concat(S.prods.map(p=>[p.code,p.name,p.cat,p.sub,p.um,p.cost,p.price,p.pm,p.stock,p.min,p.ex?'Exento':'15%'])),
+ v:[['Factura','Fecha','Cliente','Precio','Pago','Subtotal','Descuento','IVA','Total']].concat(S.sales.map(s=>[s.num,s.d,s.cli,s.tipo,s.pay,s.sub.toFixed(2),s.ds.toFixed(2),s.iva.toFixed(2),s.total.toFixed(2)])),
+ k:[['Fecha','Producto','Movimiento','Referencia','Cantidad','Saldo']].concat(S.movs.map(m=>[m.d,prod(m.pid)?prod(m.pid).name:m.pid,m.type,m.ref,m.qty,m.bal]))}[t];
+ const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\ufeff'+R.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'));a.download={p:'inventario',v:'ventas',k:'kardex'}[t]+'.csv';a.click()}
+function sel(){const o=S.prods.map(p=>`<option value="${p.id}">${esc(p.code)} – ${esc(p.name)}</option>`).join('');['cProd','aProd','kProd'].forEach(i=>{const v=$(i).value;$(i).innerHTML=o;if(v&&prod(v))$(i).value=v});
+ const v=$('fCat').value;$('fCat').innerHTML='<option value="">Todas</option>'+[...new Set(S.prods.map(p=>p.cat))].sort().map(c=>`<option>${esc(c)}</option>`).join('');$('fCat').value=v;
+ $('dc').innerHTML=[...new Set(S.prods.map(p=>p.cat))].map(c=>`<option value="${esc(c)}">`).join('')}
+$('pUm').innerHTML=UM.map(u=>`<option>${u}</option>`).join('');
+['q','fCat','fSt','fIv','fAbc','fSo','fVw'].forEach(i=>$(i).oninput=rInv);$('qv').oninput=rPos;['tipo','dsc'].forEach(i=>$(i).oninput=()=>{rPos();rCart()});$('kProd').onchange=$('kTipo').onchange=rK;
+$('rate').onchange=e=>run(()=>API.setRate(+e.target.value||36.62));
+function all(){$('rate').value=S.rate;sel();rPanel();rInv();rPos();rCart();rBuy();rK();rH()}
+async function login(){try{await API.signIn($('lgE').value.trim(),$('lgP').value);await boot()}catch(e){toast('Credenciales inválidas','e')}}
+async function boot(){if(!(await API.session())){$('lg').style.display='flex';return}$('lg').style.display='none';await refresh();go()}
+boot();
+</script>
+</body>
+</html>
